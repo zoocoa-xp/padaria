@@ -66,24 +66,12 @@ button:hover{
   font-weight:bold;
 }
 
-#cart{
-  position:fixed;
-  right:0;
-  top:0;
-  width:260px;
-  height:100%;
+.cart-box{
   background:white;
-  border-left:3px solid #ff8c00;
   padding:15px;
-  box-shadow:-2px 0 10px rgba(0,0,0,0.1);
-}
-
-#cart h3{
-  margin-top:0;
-}
-
-li{
-  margin-bottom:5px;
+  border-radius:12px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+  margin-top:20px;
 }
 
 .total{
@@ -99,12 +87,12 @@ li{
 <input id="senha" type="password" placeholder="Senha">
 <button onclick="login()">Entrar</button>
 <button onclick="register()">Cadastrar</button><h2>🍞 Produtos</h2>
-<div id="produtos" class="grid"></div></div><!-- CARRINHO --><div id="cart">
+<div id="produtos" class="grid"></div><!-- CARRINHO DENTRO DA PÁGINA --><div class="cart-box">
 <h3>🛒 Carrinho</h3>
 <ul id="cartItems"></ul>
 <div class="total">Total: R$ <span id="total">0</span></div>
 <button onclick="finalizar()">Finalizar Pedido</button>
-</div><script>
+</div></div><script>
 const supabaseClient = supabase.createClient(
   'SUA_URL_AQUI',
   'SUA_KEY_AQUI'
