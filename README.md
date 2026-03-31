@@ -97,6 +97,7 @@ ul li {
 <body>  <header>
     <h1>Pão Quente & Cia</h1>
     <p>Melhor padaria do bairro 🥖✨</p>
+  <img src="pão.png" produto da padaria>
   </header>  <div class="container"><div class="card">
   <h2>🍞 Nossos Produtos</h2>
   <ul>
