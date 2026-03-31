@@ -1,179 +1,127 @@
-
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pão Quente & Cia</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #fff8f0;
-      color: #333;
-    }
+<meta charset="UTF-8">
+<title>Padaria</title>
 
-    header {
-      background: linear-gradient(135deg, #ff8c00, #ffb347);
-      color: white;
-      padding: 30px;
-      text-align: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
-    header h1 {
-      margin: 0;
-      font-size: 2.8em;
-    }
+<style>
+body{font-family:Arial}
+.card{border:1px solid #ccc;margin:10px;padding:10px}
+#cart{position:fixed;right:0;top:0;width:250px;background:#eee;height:100%}
+</style>
 
-    header p {
-      font-size: 1.2em;
-      margin-top: 10px;
-    }
-
-    .container {
-      padding: 20px;
-      max-width: 1000px;
-      margin: auto;
-    }
-
-    .card {
-      background: white;
-      border-radius: 15px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      transition: transform 0.2s;
-    }
-
-    .card:hover {
-      transform: scale(1.02);
-    }
-
-    h2 {
-      color: #ff8c00;
-      border-bottom: 2px solid #ffb347;
-      padding-bottom: 5px;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    ul li {
-      padding: 10px;
-      border-bottom: 1px solid #eee;
-      font-size: 1.1em;
-    }
-
-    .footer {
-      background: #333;
-      color: white;
-      text-align: center;
-      padding: 15px;
-      margin-top: 20px;
-    }
-
-    .highlight {
-      font-weight: bold;
-      color: #ff8c00;
-    }
-
-    .btn {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 10px 20px;
-      background: #ff8c00;
-      color: white;
-      border-radius: 8px;
-      text-decoration: none;
-      transition: 0.3s;
-    }
-
-    .btn:hover {
-      background: #e67600;
-    }
-
-    figure {
-      text-align: center;
-      margin: 15px 0;
-    }
-
-    figure img {
-      max-width: 100%;
-      border-radius: 10px;
-    }
-
-    figcaption {
-      margin-top: 5px;
-      font-size: 0.95em;
-      color: #555;
-    }
-
-  </style>
 </head>
 <body>
 
-<header>
-  <h1>Pão Quente & Cia</h1>
-  <p>Melhor padaria do bairro 🥖✨</p>
+<h1>Padaria Online</h1>
 
-  <figure>
-    <img src="padaria.png" alt="Fachada da padaria">
-    <figcaption>faixada do estabelecimento</figcaption>
-  </figure>
-</header>
+<!-- LOGIN -->
+<input id="email" placeholder="Email">
+<input id="senha" type="password" placeholder="Senha">
+<button onclick="login()">Login</button>
+<button onclick="register()">Cadastrar</button>
 
-<div class="container">
+<h2>Produtos</h2>
+<div id="produtos"></div>
 
-  <div class="card">
-    <h2>🍞 Nossos Produtos</h2>
-
-    <figure>
-      <img src="pão.png" alt="Pão francês">
-      <figcaption>pão françes crocante</figcaption>
-    </figure>
-
-    <figure>
-      <img src="sonho.png" alt="Sonho de creme">
-      <figcaption>sonho de creme polvilhado com açúcar</figcaption>
-    </figure>
-
-    <figure>
-      <img src="bolo.png" alt="Bolo de fubá">
-      <figcaption>pedaço de bolo de fubá caseiro</figcaption>
-    </figure>
-
-    <ul>
-      <li>Pão francês fresquinho</li>
-      <li>Sonho de creme delicioso</li>
-      <li>Bolo de fubá caseiro</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <h2>⏰ Horário de Funcionamento</h2>
-    <p><span class="highlight">Segunda a Sábado:</span> 06h às 20h</p>
-    <p><span class="highlight">Domingo:</span> Fechado</p>
-  </div>
-
-  <div class="card">
-    <h2>📍 Localização</h2>
-    <p>Centro, Bataguassu - Bairro Centro</p>
-    <p>Número: 247</p>
-  </div>
-
-  <div class="card">
-    <h2>📞 Contato</h2>
-    <p>Telefone: (67) 99845-3271</p>
-    <a href="#" class="btn">Fazer Pedido</a>
-  </div>
-
+<div id="cart">
+<h3>Carrinho</h3>
+<ul id="cartItems"></ul>
+<p>Total: R$ <span id="total">0</span></p>
+<button onclick="finalizar()">Finalizar</button>
 </div>
 
-<div class="footer">
-  <p>© 2026 Pão Quente & Cia - Todos os direitos reservados</p>
-</div>
+<script>
+// 🔴 COLE AQUI SUAS CHAVES
+const supabaseClient = supabase.createClient(
+  'SUA_URL_AQUI',
+  'SUA_KEY_AQUI'
+);
+
+let carrinho = [];
+
+// LOGIN
+async function login(){
+  await supabaseClient.auth.signInWithPassword({
+    email: email.value,
+    password: senha.value
+  });
+  alert('Logado');
+}
+
+// CADASTRO
+async function register(){
+  await supabaseClient.auth.signUp({
+    email: email.value,
+    password: senha.value
+  });
+  alert('Cadastrado');
+}
+
+// CARREGAR PRODUTOS
+async function carregarProdutos(){
+  const {data} = await supabaseClient.from('produtos').select('*');
+
+  produtos.innerHTML='';
+  data.forEach(p=>{
+    produtos.innerHTML += `
+      <div class="card">
+        ${p.nome} - R$ ${p.preco}
+        <button onclick="add('${p.id}','${p.nome}',${p.preco})">Comprar</button>
+      </div>
+    `;
+  });
+}
+
+// ADD CARRINHO
+function add(id,nome,preco){
+  carrinho.push({id,nome,preco});
+  renderCart();
+}
+
+// MOSTRAR CARRINHO
+function renderCart(){
+  cartItems.innerHTML='';
+  let total=0;
+
+  carrinho.forEach(i=>{
+    total+=i.preco;
+    cartItems.innerHTML += `<li>${i.nome}</li>`;
+  });
+
+  document.getElementById('total').textContent = total;
+}
+
+// FINALIZAR PEDIDO
+async function finalizar(){
+  const user = (await supabaseClient.auth.getUser()).data.user;
+
+  const {data:pedido} = await supabaseClient
+    .from('pedidos')
+    .insert({
+      usuario_id:user.id,
+      total: document.getElementById('total').textContent
+    })
+    .select()
+    .single();
+
+  for(let item of carrinho){
+    await supabaseClient.from('itens_pedido').insert({
+      pedido_id:pedido.id,
+      produto_id:item.id,
+      preco_unitario:item.preco
+    });
+  }
+
+  alert('Pedido feito!');
+  carrinho=[];
+  renderCart();
+}
+
+carregarProdutos();
+</script>
 
 </body>
-
+</html>
