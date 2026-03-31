@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -127,4 +127,4 @@ ul li {
   </div>  <div class="footer">
     <p>© 2026 Pão Quente & Cia - Todos os direitos reservados</p>
   </div></body>
-</html>
+
