@@ -95,7 +95,7 @@ button:hover{
 </div></div><script>
 const supabaseClient = createClient(
   'https://xxxx.supabase.co',
-  'sua-chave-aqui'
+  'sb_publishable_4TEVW4FV5y9KmkbLzmZekw_EPvhTszF'
 );
 let carrinho = [];
 
