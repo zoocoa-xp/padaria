@@ -93,34 +93,63 @@ button:hover{
 <div class="total">Total: R$ <span id="total">0</span></div>
 <button onclick="finalizar()">Finalizar Pedido</button>
 </div></div><script>
+const { createClient } = supabase;
+
 const supabaseClient = createClient(
   'https://xxxx.supabase.co',
-  'sb_publishable_4TEVW4FV5y9KmkbLzmZekw_EPvhTszF'
+  'SUA_KEY_AQUI'
 );
+
 let carrinho = [];
 
+// LOGIN
 async function login(){
-  await supabaseClient.auth.signInWithPassword({
-    email: email.value,
-    password: senha.value
+  const emailVal = document.getElementById('email').value;
+  const senhaVal = document.getElementById('senha').value;
+
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email: emailVal,
+    password: senhaVal
   });
-  alert('Logado');
+
+  if(error){
+    alert(error.message);
+  } else {
+    alert('Logado!');
+  }
 }
 
+// CADASTRO
 async function register(){
-  await supabaseClient.auth.signUp({
-    email: email.value,
-    password: senha.value
+  const emailVal = document.getElementById('email').value;
+  const senhaVal = document.getElementById('senha').value;
+
+  const { error } = await supabaseClient.auth.signUp({
+    email: emailVal,
+    password: senhaVal
   });
-  alert('Cadastrado');
+
+  if(error){
+    alert(error.message);
+  } else {
+    alert('Cadastrado!');
+  }
 }
 
+// PRODUTOS
 async function carregarProdutos(){
-  const {data} = await supabaseClient.from('produtos').select('*');
+  const { data, error } = await supabaseClient.from('produtos').select('*');
 
-  produtos.innerHTML='';
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  const produtosDiv = document.getElementById('produtos');
+  produtosDiv.innerHTML='';
+
   data.forEach(p=>{
-    produtos.innerHTML += `
+    produtosDiv.innerHTML += `
       <div class="card">
         <h3>${p.nome}</h3>
         <p class="price">R$ ${p.preco}</p>
@@ -130,12 +159,16 @@ async function carregarProdutos(){
   });
 }
 
+// CARRINHO
 function add(id,nome,preco){
   carrinho.push({id,nome,preco});
   renderCart();
 }
 
 function renderCart(){
+  const cartItems = document.getElementById('cartItems');
+  const totalSpan = document.getElementById('total');
+
   cartItems.innerHTML='';
   let total=0;
 
@@ -144,17 +177,26 @@ function renderCart(){
     cartItems.innerHTML += `<li>${i.nome}</li>`;
   });
 
-  document.getElementById('total').textContent = total;
+  totalSpan.textContent = total;
 }
 
+// FINALIZAR
 async function finalizar(){
-  const user = (await supabaseClient.auth.getUser()).data.user;
+  const { data: userData } = await supabaseClient.auth.getUser();
+  const user = userData.user;
 
-  const {data:pedido} = await supabaseClient
+  if(!user){
+    alert('Faça login primeiro!');
+    return;
+  }
+
+  const total = document.getElementById('total').textContent;
+
+  const { data: pedido } = await supabaseClient
     .from('pedidos')
     .insert({
       usuario_id:user.id,
-      total: document.getElementById('total').textContent
+      total: total
     })
     .select()
     .single();
@@ -172,5 +214,6 @@ async function finalizar(){
   renderCart();
 }
 
+// INIT
 carregarProdutos();
 </script></body>
