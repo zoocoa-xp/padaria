@@ -93,11 +93,10 @@ button:hover{
 <div class="total">Total: R$ <span id="total">0</span></div>
 <button onclick="finalizar()">Finalizar Pedido</button>
 </div></div><script>
-const supabaseClient = supabase.createClient(
-  'SUA_URL_AQUI',
-  'SUA_KEY_AQUI'
+const supabaseClient = createClient(
+  'https://xxxx.supabase.co',
+  'sua-chave-aqui'
 );
-
 let carrinho = [];
 
 async function login(){
